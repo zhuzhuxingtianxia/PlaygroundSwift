@@ -1,11 +1,11 @@
 import UIKit
-import Foundation
 
 /*
  单链表:有一个数据节点和一个指向下一个节点的指针；
  单链表由数据部分和指向下一个节点的指针构成，包含一个指向头节点的指针，尾节点的下一个节点为 NULL。
 
  */
+
 
 //大数运算
 class LinkNumberNode {
@@ -20,6 +20,25 @@ class LinkNumberNode {
     
 }
 print("xxxx")
+
+// 单链表的翻转
+func reverseListNode(head: LinkNumberNode?) -> LinkNumberNode {
+    var prev: LinkNumberNode?
+    var curr = head
+    while curr != nil {
+        //保存下一个节点，防止断链
+        let nextTemp = curr?.next
+        // 让当前节点的下一个指向前一个
+        curr?.next = prev;
+        // 移动前一个位置
+        prev = curr;
+        // 遍历下一个子串
+        curr = nextTemp;
+        
+    }
+    
+    return prev!
+}
 
 func createLinkedList(inputArray:Array<String>?) -> LinkNumberNode? {
     if  inputArray == nil || inputArray?.count == 0 {
