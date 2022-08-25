@@ -155,13 +155,30 @@ class ViewController: UIViewController {
         insertObc(key: key as AnyObject, value: value as AnyObject)
     }
     
+    func structToPointer() {
+        struct Buffer {
+            var list:[Int] = []
+        }
+
+        let buffer = Buffer(list: [0,1,2,3])
+
+        let bufferPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Buffer>.size, alignment: MemoryLayout<Buffer>.alignment)
+        bufferPointer.storeBytes(of: buffer, as: Buffer.self)
+
+        bufferPointer.storeBytes(of: 5, toByteOffset: 1, as: Int.self)
+        
+        let rawList = bufferPointer.load(as: Buffer.self)
+
+        print("hello world: \(rawList.list)")
+    }
+    
     func arrayPonit() {
         var numbers:[Int] = [7,3,2,4,0]
         //获取局部变量numbers的指针(&numbers)，栈指针
         let stack_raw_numbers = withUnsafePointer(to: &numbers, { (bb) -> Int in
             return Int(bitPattern: bb)
         })
-       let sum = numbers.withUnsafeBufferPointer{buffer->Int in
+       let sum = numbers.withUnsafeBufferPointer{ buffer->Int in
             var result = 0
         //跨越式遍历，<buffer.endIndex
             for i in stride(from: buffer.startIndex, to: buffer.endIndex, by: 2) {
@@ -173,7 +190,7 @@ class ViewController: UIViewController {
         //numbers 存储在堆中地址，该存储地址不是数组元素首地址，而是以数组标识属性等开始的数组内存
         let heap_raw_numbers = unsafeBitCast(numbers, to: Int.self)
         //numbers 可以直接作为 UnsafeRawPointer 使用, 获取 数组元素存储的首地址
-        let raw_numbers = Int(bitPattern: numbers)
+        let raw_numbers = withUnsafePointer(to: &numbers, {Int(bitPattern: $0)})
         
         //1.取局部变量栈指针，通过该指针的pointee来指向数组
         var numbersPointer_test = UnsafeMutablePointer<[Int]>.init(bitPattern: stack_raw_numbers)
@@ -185,7 +202,7 @@ class ViewController: UIViewController {
         let numbersPointer_1 = numbersPointer![1]
         let numbersPointer_2 = numbersPointer![2]
         //也可以直接使用元素首地址初始化bufferPointer
-        var numbers_bufferPointer = UnsafeMutableBufferPointer.init(start: numbersPointer, count: 5)
+        var numbers_bufferPointer = UnsafeMutableBufferPointer<Int>.init(start: numbersPointer, count: 5)
 
         //这里的指针本身就是指向数组了，这导致调用pointee反而出错，pointee并不指向数组元素
         var what_numbers_pointer = UnsafeMutablePointer<[Int]>.init(bitPattern: heap_raw_numbers)
@@ -215,6 +232,7 @@ class ViewController: UIViewController {
         //等同于
         systructPointer.pointee = systruct
         
+        systructPointer.deinitialize(count: 1)
         //最后在不用的时候deallocate释放内存。
          systructPointer.deallocate()
     }
