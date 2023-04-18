@@ -16,6 +16,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        let time = CFAbsoluteTimeGetCurrent()
+        for i in 0..<10000 {
+            print("循环\(i)次")
+        }
+
+        print("时间差：\(CFAbsoluteTimeGetCurrent() - time)")
+        
         return true
     }
 
